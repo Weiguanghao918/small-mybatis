@@ -1,6 +1,10 @@
 package cn.itedus.mybatis.test.dao;
 
 import cn.itedus.mybatis.binding.MapperProxyFactory;
+import cn.itedus.mybatis.binding.MapperRegistry;
+import cn.itedus.mybatis.session.SqlSession;
+import cn.itedus.mybatis.session.SqlSessionFactory;
+import cn.itedus.mybatis.session.defaults.DefaultSqlSessionFactory;
 import cn.itedus.mybatis.test.dao.dao.IUserDao;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -19,15 +23,20 @@ public class ApiTest {
 
     @Test
     public void test_MapperProxyFactory() {
-        MapperProxyFactory<IUserDao> factory = new MapperProxyFactory<>(IUserDao.class);
-        Map<String, String> sqlSession = new HashMap<>();
 
-        sqlSession.put("cn.itedus.mybatis.test.dao.dao.IUserDao.queryUserName", "模拟执行 Mapper.xml种SQL语句的操作：查询用户姓名");
-        sqlSession.put("cn.itedus.mybatis.test.dao.dao.IUserDao.queryUserAge", "模拟执行 Mapper.xml种SQL语句的操作：查询用户年龄");
+        //1.注册Mapper
+        MapperRegistry registry = new MapperRegistry();
+        registry.addMappers("cn.itedus.mybatis.test.dao");
 
-        IUserDao userDao = factory.newInstance(sqlSession);
+        //2. 从SqlSession工厂获取Session
+        SqlSessionFactory sqlSessionFactory = new DefaultSqlSessionFactory(registry);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+
+        //3. 获取映射器对象
+        IUserDao userDao = sqlSession.getMapper(IUserDao.class);
+
+        //4. 测试验证
         String res = userDao.queryUserName("10001");
-
         logger.info("测试结果：{}", res);
 
     }
