@@ -1,6 +1,7 @@
 package cn.itedus.mybatis.binding;
 
 import cn.hutool.core.lang.ClassScanner;
+import cn.itedus.mybatis.session.Configuration;
 import cn.itedus.mybatis.session.SqlSession;
 
 import java.util.HashMap;
@@ -13,6 +14,13 @@ import java.util.Set;
  * @description: 映射器注册机
  */
 public class MapperRegistry {
+
+    private Configuration config;
+
+    public MapperRegistry(Configuration config) {
+        this.config = config;
+    }
+
     //将已添加的映射器代理加入到HashMap
     private final Map<Class<?>, MapperProxyFactory<?>> knownMappers = new HashMap<>();
 
@@ -42,7 +50,7 @@ public class MapperRegistry {
         }
     }
 
-    private <T> boolean hashMapper(Class<T> type) {
+    public  <T> boolean hashMapper(Class<T> type) {
         return knownMappers.containsKey(type);
     }
 
